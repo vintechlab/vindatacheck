@@ -1,0 +1,10 @@
+[project]
+name = "datacheck"
+version = "0.1.0"
+description = "Data Check"
+authors = [{name="Vinh Pham", email="phamtanvinh.me@gmail.com"}]
+dependencies = [
+    "pydantic>=2.11.7",
+    "pydantic_core>=2.33.2",
+    "pyyaml>=6.0.2",
+]

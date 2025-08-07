@@ -11,7 +11,8 @@ class GlobalConfig(BaseModel):
     ignore_data_types: str = ""
     ignore_columns: str = ""
     filter_data: str = ""
-    extra_columns: str = "created_at,updated_at"
+    created_at_column: str = "created_at"
+    updated_at_column: str = "updated_at"
 
 
 class MySQLConfig(GlobalConfig):

@@ -1,6 +1,6 @@
 from datacheck.core.spark import get_spark_session
 from datacheck.config import parse_args
-from datacheck.processors.comparator import compare
+from datacheck.processor.comparator import compare
 
 
 def main():

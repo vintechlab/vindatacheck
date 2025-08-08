@@ -1,12 +1,10 @@
 from dataclasses import dataclass
 from pyspark.sql import DataFrame
-from datacheck.core.loader import BaseLoader
-from ..registry import register_loader
+from datacheck.base.loader import BaseLoader
 
 
-@register_loader("bigquery")
 @dataclass
-class Loader(BaseLoader):
+class BigQueryLoader(BaseLoader):
     name = "bigquery"
 
     @property

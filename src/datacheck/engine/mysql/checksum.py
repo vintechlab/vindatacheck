@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from pyspark.sql import DataFrame
-from datacheck.core.checksum import BaseChecksum
-
-from ..registry import register_checksum
+from datacheck.base.checksum import BaseChecksum
 
 
 MIN_MAX_VALUES_QUERY_TEMPLATE = """
@@ -13,9 +11,8 @@ MIN_MAX_VALUES_QUERY_TEMPLATE = """
 """
 
 
-@register_checksum("mysql")
 @dataclass
-class Checksum(BaseChecksum):
+class MySQLChecksum(BaseChecksum):
     def get_min_max_values(self) -> tuple[str, str]:
         query = MIN_MAX_VALUES_QUERY_TEMPLATE.format(
             primary_key=self.metadata.primary_key,

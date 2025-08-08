@@ -1,19 +1,17 @@
 from dataclasses import dataclass
 from pyspark.sql import DataFrame
 
-from datacheck.core.loader import BaseLoader
+from datacheck.base.loader import BaseLoader
 
 # from datacheck.utils.common import gen_prefixes
-from ..registry import register_loader
 
 
 NUM_PARTITIONS = 1
 FETCH_SIZE = 10000
 
 
-@register_loader("mysql")
 @dataclass
-class Loader(BaseLoader):
+class MySQLLoader(BaseLoader):
     name = "mysql"
 
     @property

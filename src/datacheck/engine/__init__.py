@@ -1,4 +1,10 @@
-from . import mysql, bigquery
-from .registry import get_loader, get_metadata, get_checksum
+from datacheck.utils.common import register_import_modules
+from .registry import create_getter, get_engine_components
 
-__all__ = ["get_loader", "get_metadata", "get_checksum", "mysql", "bigquery"]
+
+register_import_modules(__name__, __path__)
+
+_getters = {f"get_{component}": create_getter(component) for component in get_engine_components()}
+globals().update(_getters)
+
+__all__ = list(_getters.keys())

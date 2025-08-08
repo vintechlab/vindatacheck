@@ -1,3 +1,12 @@
-from . import loader, metadata, checksum
+from .loader import MySQLLoader
+from .metadata import MySQLTableMetadata
+from .checksum import MySQLChecksum
 
-__all__ = ["loader", "metadata", "checksum"]
+from ..registry import register_engine
+
+register_engine(
+    "mysql",
+    loader=MySQLLoader,
+    checksum=MySQLChecksum,
+    metadata=MySQLTableMetadata,
+)

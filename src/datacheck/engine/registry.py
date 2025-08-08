@@ -1,34 +1,57 @@
-from typing import Callable, Dict
-
-REGISTRIES: Dict[str, Dict[str, Callable]] = {
-    "loader": {},
-    "metadata": {},
-    "checksum": {},
-}
+from typing import Type, Callable, Dict, Any, Set
+from inspect import signature
+from typing import TypedDict
 
 
-def create_register_function(registry_name: str):
-    def decorator(name: str):
-        def wrapper(cls: Callable):
-            REGISTRIES[registry_name][name] = cls
-            return cls
-
-        return wrapper
-
-    return decorator
+class EngineConfig(TypedDict):
+    loader: Type[Callable]
+    checksum: Type[Callable]
+    metadata: Type[Callable]
 
 
-def create_get_function(registry_name: str):
-    def getter(name: str, *args, **kwargs):
-        return REGISTRIES[registry_name][name](*args, **kwargs)
+_ENGINE_REGISTRY: Dict[str, EngineConfig] = {}
 
+
+def register_engine(
+    name: str,
+    loader: Type[Callable] = None,
+    checksum: Type[Callable] = None,
+    metadata: Type[Callable] = None,
+    **kwargs: Any,
+) -> None:
+    if not name:
+        raise ValueError("Engine name cannot be empty.")
+    if name in _ENGINE_REGISTRY:
+        raise ValueError(f"Engine '{name}' is already registered.")
+
+    # Validate components are callable (classes or functions)
+    for component_name, component in [("loader", loader), ("checksum", checksum), ("metadata", metadata)]:
+        if component is not None and not (callable(component) or isinstance(component, type)):
+            raise TypeError(f"Component '{component_name}' for engine '{name}' must be a callable or class.")
+
+    _ENGINE_REGISTRY[name] = dict(
+        loader=loader,
+        checksum=checksum,
+        metadata=metadata,
+        **kwargs,
+    )
+
+
+def create_getter(component: str) -> Callable:
+    def getter(engine_name: str, *args, **kwargs) -> Any:
+        if engine_name not in _ENGINE_REGISTRY:
+            raise KeyError(f"Engine '{engine_name}' not found in registry.")
+        if component not in _ENGINE_REGISTRY[engine_name]:
+            raise KeyError(f"Component '{component}' not found for engine '{engine_name}'.")
+        component_func = _ENGINE_REGISTRY[engine_name][component]
+        if component_func is None:
+            raise ValueError(f"Component '{component}' is not defined for engine '{engine_name}'.")
+        return component_func(*args, **kwargs)
+
+    getter.__name__ = f"get_{component}"
+    getter.__doc__ = f"Retrieve the '{component}' component for the specified engine."
     return getter
 
 
-register_loader = create_register_function("loader")
-register_metadata = create_register_function("metadata")
-register_checksum = create_register_function("checksum")
-
-get_loader = create_get_function("loader")
-get_metadata = create_get_function("metadata")
-get_checksum = create_get_function("checksum")
+def get_engine_components() -> Set[str]:
+    return set(signature(register_engine).parameters.keys()) - {"name", "kwargs"}

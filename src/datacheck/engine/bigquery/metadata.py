@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from pyspark.sql import DataFrame
-from datacheck.core.metadata import BaseTableMetadata
-from ..registry import register_metadata
+from datacheck.base.metadata import BaseTableMetadata
 
 
 METADATA_QUERY_TEMPLATE = """
@@ -14,9 +13,8 @@ METADATA_QUERY_TEMPLATE = """
 """
 
 
-@register_metadata("bigquery")
 @dataclass
-class TableMetadata(BaseTableMetadata):
+class BigQueryTableMetadata(BaseTableMetadata):
     def update_properties(self) -> None:
         self.data_source = self.config.type
         self.table_schema = self.config.database

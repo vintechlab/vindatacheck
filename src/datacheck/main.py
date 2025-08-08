@@ -1,4 +1,4 @@
-from datacheck.core.spark import get_spark_session
+from datacheck.spark import get_spark_session
 from datacheck.config import parse_args
 from datacheck.processor.comparator import compare
 

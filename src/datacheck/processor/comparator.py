@@ -3,8 +3,8 @@ from typing import Callable
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, when
 
-from datacheck.core.checksum import BaseChecksum
-from datacheck.core.metadata import BaseTableMetadata
+from datacheck.base.checksum import BaseChecksum
+from datacheck.base.metadata import BaseTableMetadata
 from datacheck.engine import get_loader, get_metadata, get_checksum
 
 from .typecaster.factory import TypeCasterFactory
@@ -19,10 +19,10 @@ def load_checksum(
     spark: SparkSession,
     config: any,
     metadata: BaseTableMetadata,
-    cast_column: Callable[[str, str], str],
+    cast_column_hook: Callable[[str, str], str],
 ) -> BaseChecksum:
     loader = get_loader(config.type, spark, config)
-    checksum = get_checksum(config.type, loader, config, metadata, cast_column)
+    checksum = get_checksum(config.type, loader, config, metadata, cast_column_hook)
     return checksum.load()
 
 

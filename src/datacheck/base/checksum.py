@@ -24,7 +24,7 @@ class BaseChecksum(ABC):
     loader: BaseLoader
     config: DataSourceConfig
     metadata: BaseTableMetadata
-    cast_column: Callable[[str, str], str]
+    cast_column_hook: Callable[[str, str], str]
 
     @abstractmethod
     def build_checksum_expression(self, cast_columns: list[str]) -> str:
@@ -48,7 +48,7 @@ class BaseChecksum(ABC):
         return [(row.COLUMN_NAME, row.DATA_TYPE) for row in rows]
 
     def build_checksum_query(self):
-        cast_columns = [self.cast_column(column_name, data_type) for column_name, data_type in self.columns]
+        cast_columns = [self.cast_column_hook(column_name, data_type) for column_name, data_type in self.columns]
         checksum_expression = self.build_checksum_expression(cast_columns)
 
         created_at_column = f"{self.metadata.created_at_column},\n" if self.metadata.created_at_column else ""

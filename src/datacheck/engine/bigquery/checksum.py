@@ -1,13 +1,10 @@
 from dataclasses import dataclass
 from pyspark.sql import DataFrame
-from datacheck.core.checksum import BaseChecksum
-
-from ..registry import register_checksum
+from datacheck.base.checksum import BaseChecksum
 
 
-@register_checksum("bigquery")
 @dataclass
-class Checksum(BaseChecksum):
+class BigQueryChecksum(BaseChecksum):
     def build_checksum_expression(self, casted_columns: list[str]) -> str:
         return f"TO_HEX(MD5(ARRAY_TO_STRING([{', '.join(casted_columns)}], '|')))"
 

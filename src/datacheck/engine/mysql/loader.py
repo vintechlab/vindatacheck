@@ -69,11 +69,4 @@ class MySQLLoader(BaseLoader):
         )
 
     def load(self, query: str) -> DataFrame:
-        return (
-            self.spark.read.format("jdbc")
-            .options(
-                **self.spark_options,
-                query=query,
-            )
-            .load()
-        )
+        return self.spark.read.format("jdbc").options(**self.spark_options).option("query", query).load()

@@ -2,7 +2,10 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing import Callable
 from pyspark.sql import DataFrame
+from pyspark.sql.functions import col
 from datacheck.config import DataSourceConfig
+
+from datacheck.utils.common import split_and_strip
 
 from .loader import BaseLoader
 from .metadata import BaseTableMetadata
@@ -36,14 +39,18 @@ class BaseChecksum(ABC):
 
     @property
     def columns(self) -> list[tuple[str, str]]:
-        ignore_columns = [col.strip() for col in self.config.ignore_columns.split(",") if col.strip()]
-        ignore_data_types = [dt.strip() for dt in self.config.ignore_data_types.split(",") if dt.strip()]
+        whitelist_columns = split_and_strip(self.config.whitelist_columns)
+        ignore_columns = split_and_strip(self.config.ignore_columns)
+        ignore_data_types = split_and_strip(self.config.ignore_data_types)
 
         df = self.metadata.metadata.select("COLUMN_NAME", "DATA_TYPE")
-        if ignore_columns:
-            df = df.filter(~df["COLUMN_NAME"].isin(ignore_columns))
-        if ignore_data_types:
-            df = df.filter(~df["DATA_TYPE"].isin(ignore_data_types))
+        if whitelist_columns:
+            df = df.filter(col("COLUMN_NAME").isin(whitelist_columns))
+        else:
+            if ignore_columns:
+                df = df.filter(~col("COLUMN_NAME").isin(ignore_columns))
+            if ignore_data_types:
+                df = df.filter(~col("DATA_TYPE").isin(ignore_data_types))
         rows = df.collect()
         return [(row.COLUMN_NAME, row.DATA_TYPE) for row in rows]
 

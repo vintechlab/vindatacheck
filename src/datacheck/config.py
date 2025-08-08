@@ -8,11 +8,13 @@ from pyspark import SparkFiles
 
 
 class GlobalConfig(BaseModel):
+    whitelist_columns: str = ""
     ignore_data_types: str = ""
     ignore_columns: str = ""
     filter_data: str = ""
     created_at_column: str = "created_at"
     updated_at_column: str = "updated_at"
+    cutoff_minutes: int = 0
 
 
 class MySQLConfig(GlobalConfig):

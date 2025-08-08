@@ -2,9 +2,9 @@ from .loader import MySQLLoader
 from .metadata import MySQLTableMetadata
 from .checksum import MySQLChecksum
 
-from ..registry import register_engine
+from ..registry import engine_registry
 
-register_engine(
+engine_registry.register(
     "mysql",
     loader=MySQLLoader,
     checksum=MySQLChecksum,

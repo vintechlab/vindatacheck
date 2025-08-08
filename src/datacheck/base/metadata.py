@@ -19,7 +19,7 @@ class BaseTableMetadata(ABC):
     def __post_init__(self):
         self.update_properties()
         self.update_metadata()
-        if not self.has_primary_key():
+        if self.metadata.filter("IS_PRIMARY_KEY = 1").count() == 0:
             raise ValueError(f"No primary key found for table {self.table_name}")
 
     @abstractmethod
@@ -29,9 +29,6 @@ class BaseTableMetadata(ABC):
     @abstractmethod
     def update_metadata(self) -> DataFrame:
         pass
-
-    def has_primary_key(self) -> bool:
-        return self.metadata.filter("IS_PRIMARY_KEY = 1").count() > 0
 
     @property
     def primary_key(self) -> str:

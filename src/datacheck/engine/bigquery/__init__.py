@@ -2,9 +2,9 @@ from .loader import BigQueryLoader
 from .metadata import BigQueryTableMetadata
 from .checksum import BigQueryChecksum
 
-from ..registry import register_engine
+from ..registry import engine_registry
 
-register_engine(
+engine_registry.register(
     "bigquery",
     loader=BigQueryLoader,
     checksum=BigQueryChecksum,

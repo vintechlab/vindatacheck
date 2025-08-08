@@ -1,4 +1,5 @@
 from typing import Callable
+from datetime import datetime, timedelta
 
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, when
@@ -23,7 +24,16 @@ def load_checksum(
 ) -> BaseChecksum:
     loader = get_loader(config.type, spark, config)
     checksum = get_checksum(config.type, loader, config, metadata, cast_column_hook)
-    return checksum.load()
+    df = checksum.load()
+    if config.cutoff_minutes:
+        cutoff_column = (
+            checksum.metadata.created_at_column
+            if checksum.metadata.created_at_column
+            else checksum.metadata.updated_at_column
+        )
+        df = df.filter(col(cutoff_column) < (datetime.now() - timedelta(minutes=config.cutoff_minutes)))
+
+    return df
 
 
 def check_mismatches(df_source: DataFrame, df_target: DataFrame, primary_key: str) -> DataFrame:

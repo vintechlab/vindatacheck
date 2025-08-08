@@ -16,3 +16,7 @@ def register_import_modules(name: str, module_path: str):
     for _, module_name, is_pkg in pkgutil.iter_modules(module_path):
         if is_pkg and module_name not in ("registry",):
             importlib.import_module(f"{name}.{module_name}")
+
+
+def split_and_strip(string: str, separator: str = ",") -> list[str]:
+    return [item.strip() for item in string.split(separator) if item.strip()]

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from pyspark.sql import DataFrame
 from datacheck.base.checksum import BaseChecksum
+from datacheck.utils.common import gen_prefixes
 
 
 MIN_MAX_VALUES_QUERY_TEMPLATE = """
@@ -28,11 +29,13 @@ class MySQLChecksum(BaseChecksum):
     def load(self) -> DataFrame:
         match self.metadata.primary_key_data_type.lower():
             case "char" | "varchar":
-                prefixes = ["aaa", "bbb", "ccc"]
+                prefixes = gen_prefixes(length=3, use_uppercase=False)
                 predicates = [f"{self.metadata.primary_key} LIKE '{prefix}%'" for prefix in prefixes]
                 return self.loader.load_with_predicates(
                     query=self.build_checksum_query(),
                     predicates=predicates,
+                    num_partitions=self.config.num_partitions,
+                    fetch_size=self.config.fetch_size,
                 )
             case (
                 "tinyint"
@@ -54,6 +57,8 @@ class MySQLChecksum(BaseChecksum):
                     partition_column=self.metadata.primary_key,
                     min_value=min_val,
                     max_value=max_val,
+                    num_partitions=self.config.num_partitions,
+                    fetch_size=self.config.fetch_size,
                 )
             case _:
                 raise ValueError(f"Unsupported data type: {self.metadata.primary_key_data_type}")

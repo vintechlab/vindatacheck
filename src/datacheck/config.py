@@ -24,6 +24,8 @@ class MySQLConfig(GlobalConfig):
     table_name: str
     mysql_user: str = os.getenv("MYSQL_USER", "")
     mysql_password: str = os.getenv("MYSQL_PASSWORD", "")
+    num_partitions: int = 4
+    fetch_size: int = 1000
 
 
 class BigQueryConfig(GlobalConfig):

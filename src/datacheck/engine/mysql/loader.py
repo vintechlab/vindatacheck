@@ -3,8 +3,6 @@ from pyspark.sql import DataFrame
 
 from datacheck.base.loader import BaseLoader
 
-# from datacheck.utils.common import gen_prefixes
-
 
 NUM_PARTITIONS = 1
 FETCH_SIZE = 10000
